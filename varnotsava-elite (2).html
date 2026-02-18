@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+    <title>Varnotsava Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Orbitron:wght@600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --art-gold: #FFD700;
+            --art-gold-dim: rgba(255, 215, 0, 0.3);
+            --gold-gradient: linear-gradient(135deg, #cfc09f 0%, #ffecb3 20%, #bf953f 40%, #b38728 100%);
+            --gold-border: linear-gradient(145deg, rgba(255, 215, 0, 0.5) 0%, rgba(255, 215, 0, 0.1) 100%);
+            --bg-body: #010a18;
+            --card-bg: radial-gradient(circle at 50% 0%, #162c4c 0%, #000510 80%);
+            --glass-panel: rgba(13, 25, 48, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-light: #f0f0f0;
+            --text-dim: #a0a0a0;
+        }
+
+        body.female-theme {
+            --bg-body: #1a0505;
+            --card-bg: radial-gradient(circle at 50% 0%, #4a0f0f 0%, #120000 80%);
+            --glass-panel: rgba(48, 13, 13, 0.5);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        body {
+            background: #000;
+            margin: 0;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; 
+            color: var(--text-light);
+        }
+
+        /* ═══ PHONE FRAME ═══ */
+        .phone-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(0,0,0,1);
+            transition: background 1.2s ease;
+        }
+
+        @media (min-width: 481px) {
+            .phone-frame {
+                max-width: 420px;
+                height: 90vh;
+                max-height: 850px;
+                border-radius: 36px;
+                border: 4px solid #111;
+                box-shadow: 0 0 0 2px #333, 0 20px 50px rgba(0,0,0,0.8);
+            }
+        }
+
+        /* ═══ ART LAYER ═══ */
+        .art-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .mandala-scatter {
+            position: absolute;
+            opacity: 0;
+            animation: mandalaPulse var(--dur, 28s) ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
+        }
+        @keyframes mandalaPulse {
+            0%   { opacity: 0;               transform: rotate(var(--rs,0deg)) scale(0.94); }
+            18%  { opacity: var(--op,0.15);  }
+            50%  { opacity: var(--op,0.15);  transform: rotate(var(--re,180deg)) scale(1.03); }
+            82%  { opacity: var(--op,0.15);  }
+            100% { opacity: 0;               transform: rotate(var(--re,360deg)) scale(0.94); }
+        }
+
+        .shimmer-sweep {
+            position: absolute;
+            top: 0; left: -100%; width: 55%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.045) 50%, transparent 100%);
+            animation: sweepAcross 9s ease-in-out infinite;
+            pointer-events: none; z-index: 1;
+        }
+        @keyframes sweepAcross {
+            0%   { left: -60%; opacity: 0; }
+            8%   { opacity: 1; }
+            92%  { opacity: 1; }
+            100% { left: 110%; opacity: 0; }
+        }
+
+        .rule-line {
+            position: absolute; top: 0; width: 1px; height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, rgba(255,215,0,0.07) 30%, rgba(255,215,0,0.07) 70%, transparent 100%);
+            pointer-events: none; z-index: 1;
+        }
+        .rule-line.left  { left: 20px; }
+        .rule-line.right { right: 20px; }
+
+        .corner-ornament {
+            position: absolute; width: 36px; height: 36px;
+            z-index: 3; pointer-events: none;
+        }
+        .corner-ornament.tl { top: 12px; left: 12px; }
+        .corner-ornament.tr { top: 12px; right: 12px; transform: scaleX(-1); }
+        .corner-ornament.bl { bottom: 12px; left: 12px; transform: scaleY(-1); }
+        .corner-ornament.br { bottom: 12px; right: 12px; transform: scale(-1,-1); }
+        .corner-ornament svg { width: 100%; height: 100%; }
+
+        .particle {
+            position: absolute; border-radius: 50%; opacity: 0;
+            animation: floatUp var(--pdur,10s) var(--pdelay,0s) infinite linear;
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+            15%  { opacity: 0.75; }
+            85%  { opacity: 0.45; }
+            100% { transform: translateY(-8vh) translateX(var(--drift,0px)) scale(1.3); opacity: 0; }
+        }
+
+        /* ═══ UI LAYOUT - MOBILE OPTIMIZED ═══ */
+        .ui-content {
+            z-index: 2; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            padding: 16px 18px 12px 18px;
+            height: 100%;
+            background: radial-gradient(circle at top, rgba(255,255,255,0.03) 0%, transparent 55%);
+            transition: opacity 0.6s ease;
+        }
+        .ui-content.hidden { opacity: 0; pointer-events: none; }
+
+        /* HEADER - COMPRESSED */
+        .header { text-align: center; margin-bottom: 2px; }
+        
+        .sub-title { 
+            color: var(--art-gold); 
+            letter-spacing: 4px; 
+            font-size: 0.5rem;
+            font-weight: 700; 
+            text-transform: uppercase; 
+            margin-bottom: 3px;
+            opacity: 0.85;
+        }
+        
+        .main-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.5rem; 
+            line-height: 1;
+            margin-bottom: 8px;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 2px 8px rgba(255,215,0,0.4);
+        }
+        .title-underline {
+            width: 60px;
+            height: 1px;
+            background: var(--gold-gradient);
+            margin: 6px auto 0;
+        }
+
+        /* TIMER - COMPACT */
+        .timer-wrapper { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: 6px;
+            transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .timer-wrapper.centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.6);
+            z-index: 200;
+            margin: 0;
+        }
+        
+        .timer-container {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 5px; 
+            padding: 5px 0; 
+            width: 130px; 
+            text-align: center;
+            -webkit-backdrop-filter: blur(10px); 
+            backdrop-filter: blur(10px);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 1.2s ease;
+        }
+        .timer-container.glow {
+            box-shadow: 0 0 30px rgba(255,215,0,0.5), 0 0 60px rgba(255,215,0,0.25);
+            border-color: rgba(255,215,0,0.7);
+        }
+        .timer-container::before, .timer-container::after {
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            width: 6px; 
+            height: 6px;
+            background: var(--art-gold); 
+            transform: translateY(-50%) rotate(45deg);
+            box-shadow: 0 0 6px rgba(255,215,0,0.6);
+        }
+        .timer-container::before { left: -3px; }
+        .timer-container::after  { right: -3px; }
+        .timer-digits {
+            font-family: 'Orbitron', monospace; 
+            font-size: 1rem; 
+            color: #fff;
+            letter-spacing: 2px; 
+            font-variant-numeric: tabular-nums; 
+            font-feature-settings: "tnum";
+            text-shadow: 0 0 12px rgba(255,215,0,0.6);
+        }
+
+        /* V SYMBOL - COMPACT */
+        .v-symbol-container {
+            height: 44px; 
+            margin: 4px 0 10px 0;
+            display: flex; 
+            justify-content: center;
+            filter: drop-shadow(0 0 10px rgba(255,215,0,0.4));
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+        /* TABS - COMPACT */
+        .tabs-row {
+            display: flex; 
+            background: rgba(255,255,255,0.03);
+            border-radius: 40px; 
+            padding: 3px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .tab-slider {
+            position: absolute; 
+            top: 3px; 
+            bottom: 3px; 
+            left: 3px;
+            width: calc(50% - 3px); 
+            border-radius: 35px;
+            background: var(--gold-gradient);
+            box-shadow: 0 2px 16px rgba(255,215,0,0.25);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            z-index: 0;
+        }
+        .tab-slider.right { transform: translateX(100%); }
+        .tab-btn {
+            flex: 1; 
+            text-align: center; 
+            padding: 9px 0;
+            font-size: 0.72rem; 
+            font-weight: 600; 
+            color: var(--text-dim);
+            border-radius: 35px; 
+            cursor: pointer;
+            transition: color 0.4s ease; 
+            text-transform: uppercase;
+            letter-spacing: 0.8px; 
+            position: relative; 
+            z-index: 1;
+        }
+        .tab-btn.active { color: #111; font-weight: 800; }
+        .check { display: none; margin-left: 3px; color: #004400; font-weight: 900; font-size: 0.7rem; }
+        .tab-btn.done .check { display: inline; }
+
+        /* SEARCH - COMPACT */
+        .search-container { margin-bottom: 10px; position: relative; }
+        .search-icon {
+            position: absolute; 
+            left: 14px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            color: rgba(255,215,0,0.35); 
+            font-size: 0.75rem; 
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%; 
+            padding: 11px 18px 11px 36px;
+            border-radius: 12px; 
+            border: 1px solid transparent;
+            background: linear-gradient(var(--glass-panel), var(--glass-panel)) padding-box,
+                        var(--gold-border) border-box;
+            color: #fff; 
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400; 
+            font-size: 0.8rem; 
+            outline: none;
+            transition: box-shadow 0.3s;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.22);
+            -webkit-backdrop-filter: blur(8px); 
+            backdrop-filter: blur(8px);
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 0.8px; }
+        .search-input:focus { box-shadow: 0 0 0 1px rgba(255,215,0,0.25), 0 0 20px rgba(255,215,0,0.08); }
+
+        /* LIST - OPTIMIZED FOR MOBILE */
+        .list-container {
+            flex: 1; 
+            overflow-y: auto;
+            padding: 2px;
+            -webkit-mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 88%, transparent 100%);
+            scrollbar-width: thin; 
+            scrollbar-color: rgba(255,215,0,0.18) transparent;
+        }
+        .list-container::-webkit-scrollbar { width: 2px; }
+        .list-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 1px; }
+
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .participant-card {
+            background: linear-gradient(110deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.065) 100%);
+            margin-bottom: 7px; 
+            padding: 12px 16px; 
+            border-radius: 11px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: transform 0.22s ease, background 0.28s, border-color 0.28s, box-shadow 0.28s;
+            position: relative; 
+            overflow: hidden; 
+            cursor: pointer;
+            animation: cardEnter 0.36s ease both;
+        }
+        .participant-card::before {
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+        }
+        .participant-card::after {
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 60%; 
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.05), transparent);
+            transition: left 0.5s ease;
+        }
+        .participant-card:hover::after { left: 140%; }
+        .participant-card:hover { 
+            transform: translateY(-1px); 
+            border-color: rgba(255,215,0,0.16); 
+            box-shadow: 0 5px 18px rgba(0,0,0,0.35); 
+        }
+        .participant-card:active { transform: scale(0.975); }
+
+        .card-name { font-weight: 600; font-size: 0.85rem; color: #e0e0e0; letter-spacing: 0.4px; }
+        .card-id   { font-size: 0.62rem; color: var(--art-gold); font-family: 'Orbitron', sans-serif; opacity: 0.58; margin-top: 3px; }
+
+        .participant-card.selected {
+            background: linear-gradient(100deg, rgba(255,215,0,0.11) 0%, rgba(255,215,0,0.03) 100%);
+            border: 1px solid rgba(255,215,0,0.5);
+            box-shadow: 0 0 18px rgba(255,215,0,0.06), inset 0 0 14px rgba(255,215,0,0.035);
+        }
+        .participant-card.selected .card-name { color: var(--art-gold); }
+        .participant-card.selected .card-id   { opacity: 0.85; }
+
+        .selected-star {
+            color: var(--art-gold); 
+            font-size: 1.1rem;
+            animation: starPop 0.38s cubic-bezier(0.175,0.885,0.32,1.275) both;
+            filter: drop-shadow(0 0 4px rgba(255,215,0,0.7));
+        }
+        @keyframes starPop {
+            from { transform: scale(0) rotate(-90deg); opacity: 0; }
+            to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+        }
+        .unselected-ring { color: rgba(255,255,255,0.08); font-size: 0.9rem; }
+
+        /* FOOTER - COMPACT */
+        .footer {
+            padding-top: 8px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: flex-end; 
+            min-height: 70px;
+        }
+        .hint {
+            color: var(--art-gold); 
+            font-size: 0.62rem; 
+            margin-bottom: 8px;
+            letter-spacing: 1.5px; 
+            text-transform: uppercase; 
+            opacity: 0.65;
+            animation: pulse 2.4s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:0.28} 50%{opacity:0.8} }
+
+        .cast-btn {
+            width: 100%; 
+            padding: 14px;
+            background: var(--gold-gradient); 
+            border: none; 
+            border-radius: 14px;
+            font-family: 'Cinzel Decorative', serif; 
+            font-weight: 900;
+            font-size: 0.9rem; 
+            color: #1a0800;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 0 20px rgba(255,215,0,0.2);
+            opacity: 0; 
+            transform: translateY(16px);
+            transition: all 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
+            pointer-events: none; 
+            letter-spacing: 1.8px;
+            position: relative; 
+            overflow: hidden;
+        }
+        .cast-btn::after {
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 60%; 
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: btnShimmer 2.8s 1.4s ease-in-out infinite;
+        }
+        @keyframes btnShimmer { 0%{left:-100%} 100%{left:150%} }
+        .cast-btn.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+        .cast-btn:active  { transform: scale(0.97); }
+
+        /* ═══ SUCCESS OVERLAY - BLACK SCREEN ═══ */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .success-overlay.show { opacity: 1; pointer-events: all; }
+
+        /* V Symbol animation on black screen */
+        .success-v-symbol {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: scale(0);
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.6));
+        }
+        .success-v-symbol.animate {
+            animation: vSymbolAppear 1s 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes vSymbolAppear {
+            0%   { opacity: 0; transform: scale(0) rotate(-180deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        /* Success text */
+        .success-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #FFD700;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .success-title.animate {
+            animation: successTextAppear 0.8s 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes successTextAppear {
+            0%   { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RIPPLE */
+        .ripple {
+            position: absolute; 
+            border-radius: 50%;
+            background: rgba(255,215,0,0.12);
+            transform: scale(0);
+            animation: rippleAnim 0.55s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        /* Post-vote state - visible elements */
+        .page-content.post-vote .sub-title,
+        .page-content.post-vote .main-title,
+        .page-content.post-vote .v-symbol-container,
+        .page-content.post-vote .tabs-row,
+        .page-content.post-vote .search-container,
+        .page-content.post-vote .list-container,
+        .page-content.post-vote .footer {
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+    </style>
+</head>
+<body class="male-theme">
+
+    <div class="phone-frame" id="phone-frame">
+        
+        <!-- ART LAYER -->
+        <div class="art-layer" id="art-layer">
+            <div class="shimmer-sweep"></div>
+            <div class="rule-line left"></div>
+            <div class="rule-line right"></div>
+            <div id="particles"></div>
+        </div>
+
+        <!-- Corner ornaments -->
+        <div class="corner-ornament tl">
+            <svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,215,0,0.32)" stroke-width="1">
+                <path d="M2,34 L2,2 L34,2" stroke-linecap="round"/>
+                <circle cx="2" cy="2" r="2" fill="rgba(255,215,0,0.45)" stroke="none"/>
+                <path d="M8,2 L8,8 M2,8 L8,8" stroke-width="0.5" opacity="0.5"/>
+                <circle cx="14" cy="2" r="0.8" fill="rgba(255,215,0,0.35)" stroke="none"/>
+                <circle cx="20" cy="2" r="0.8" fill="rgba(255,215,0,0.35)" stroke="none"/>
+            </svg>
+        </div>
+        <div class="corner-ornament tr">
+            <svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,215,0,0.32)" stroke-width="1">
+                <path d="M2,34 L2,2 L34,2" stroke-linecap="round"/>
+                <circle cx="2" cy="2" r="2" fill="rgba(255,215,0,0.45)" stroke="none"/>
+                <path d="M8,2 L8,8 M2,8 L8,8" stroke-width="0.5" opacity="0.5"/>
+                <circle cx="14" cy="2" r="0.8" fill="rgba(255,215,0,0.35)" stroke="none"/>
+                <circle cx="20" cy="2" r="0.8" fill="rgba(255,215,0,0.35)" stroke="none"/>
+            </svg>
+        </div>
+        <div class="corner-ornament bl">
+            <svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,215,0,0.32)" stroke-width="1">
+                <path d="M2,34 L2,2 L34,2" stroke-linecap="round"/>
+                <circle cx="2" cy="2" r="2" fill="rgba(255,215,0,0.45)" stroke="none"/>
+                <path d="M8,2 L8,8 M2,8 L8,8" stroke-width="0.5" opacity="0.5"/>
+            </svg>
+        </div>
+        <div class="corner-ornament br">
+            <svg viewBox="0 0 36 36" fill="none" stroke="rgba(255,215,0,0.32)" stroke-width="1">
+                <path d="M2,34 L2,2 L34,2" stroke-linecap="round"/>
+                <circle cx="2" cy="2" r="2" fill="rgba(255,215,0,0.45)" stroke="none"/>
+                <path d="M8,2 L8,8 M2,8 L8,8" stroke-width="0.5" opacity="0.5"/>
+            </svg>
+        </div>
+
+        <!-- TIMER (moves to center after vote) -->
+        <div class="timer-wrapper" id="timer-wrapper">
+            <div class="timer-container" id="timer-container">
+                <div class="timer-digits" id="timer">01:21:26</div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="ui-content page-content" id="ui-content">
+            <div class="header">
+                <div class="sub-title">VARNOTSAVA 2026</div>
+                <div class="main-title">
+                    FASHION<br>PHENOMENON
+                    <div class="title-underline"></div>
+                </div>
+            </div>
+
+            <div class="v-symbol-container">
+                <svg viewBox="0 0 100 100" fill="none" height="100%">
+                    <circle cx="50" cy="56" r="36" stroke="rgba(255,215,0,0.055)" stroke-width="0.8"/>
+                    <circle cx="50" cy="56" r="27" stroke="rgba(255,215,0,0.035)" stroke-width="0.8" stroke-dasharray="2,3"/>
+                    <path d="M18,18 L50,88 L82,18" stroke="var(--art-gold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M33,18 L50,58 L67,18" stroke="rgba(255,215,0,0.38)" stroke-width="1.3" stroke-linecap="round"/>
+                    <circle cx="18" cy="26" r="5" fill="#FFD700"/>
+                    <circle cx="18" cy="26" r="2.5" fill="#fff8dc"/>
+                    <circle cx="25" cy="45" r="5" fill="#FFD700"/>
+                    <circle cx="25" cy="45" r="2.5" fill="#fff8dc"/>
+                    <circle cx="33" cy="64" r="5" fill="#FFD700"/>
+                    <circle cx="33" cy="64" r="2.5" fill="#fff8dc"/>
+                    <rect x="47" y="12" width="6" height="6" transform="rotate(45 50 15)" fill="rgba(255,215,0,0.6)"/>
+                </svg>
+            </div>
+
+            <div class="tabs-row">
+                <div class="tab-slider" id="tab-slider"></div>
+                <div id="tab-male" class="tab-btn active" onclick="setCategory('Male')">
+                    Prince <span class="check">✔</span>
+                </div>
+                <div id="tab-female" class="tab-btn" onclick="setCategory('Female')">
+                    Princess <span class="check">✔</span>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <div class="search-icon">◈</div>
+                <input type="text" id="search-box" class="search-input" placeholder="Find Candidate..." onkeyup="filterList()">
+            </div>
+
+            <div class="list-container" id="list-area"></div>
+
+            <div class="footer">
+                <div id="hint-text" class="hint">Awaiting Selection</div>
+                <button id="btn-vote" class="cast-btn" onclick="submitVote()">✦ CONFIRM VOTE ✦</button>
+            </div>
+        </div>
+
+        <!-- SUCCESS OVERLAY - BLACK SCREEN -->
+        <div class="success-overlay" id="success-overlay">
+            <svg class="success-v-symbol" id="success-v-symbol" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="45" stroke="rgba(255,215,0,0.1)" stroke-width="1"/>
+                <circle cx="50" cy="50" r="35" stroke="rgba(255,215,0,0.08)" stroke-width="1" stroke-dasharray="3,5"/>
+                <path d="M15,15 L50,92 L85,15" stroke="var(--art-gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M30,15 L50,60 L70,15" stroke="rgba(255,215,0,0.5)" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="15" cy="23" r="6" fill="#FFD700"/>
+                <circle cx="15" cy="23" r="3" fill="#fff8dc"/>
+                <circle cx="23" cy="45" r="6" fill="#FFD700"/>
+                <circle cx="23" cy="45" r="3" fill="#fff8dc"/>
+                <circle cx="32" cy="67" r="6" fill="#FFD700"/>
+                <circle cx="32" cy="67" r="3" fill="#fff8dc"/>
+                <rect x="47" y="8" width="6" height="6" transform="rotate(45 50 11)" fill="rgba(255,215,0,0.7)"/>
+            </svg>
+            <div class="success-title" id="success-title">VOTES<br>SUCCESSFULLY</div>
+        </div>
+    </div>
+
+    <script>
+    /* ═══ MANDALA GENERATOR ═══ */
+    function buildMandala(rings, spokes, size) {
+        const cx = 250, cy = 250;
+        let paths = [];
+
+        for (let i = 0; i < spokes; i++) {
+            const angle = (i / spokes) * Math.PI * 2;
+            paths.push(`<line x1="${cx}" y1="${cy}" x2="${cx + 215 * Math.cos(angle)}" y2="${cy + 215 * Math.sin(angle)}" stroke-opacity="0.4" stroke-width="0.6"/>`);
+        }
+
+        const ringDefs = [
+            { r: 32, dash: '1,3', sw: '0.5' },
+            { r: 58, dash: '3,5', sw: '0.9' },
+            { r: 88, dash: '1,2', sw: '0.6' },
+            { r: 118, dash: '6,3', sw: '0.9' },
+            { r: 150, dash: '2,4', sw: '0.6' },
+            { r: 183, dash: '9,3', sw: '0.9' },
+            { r: 212, dash: '1,1', sw: '0.5' },
+        ].slice(0, rings);
+
+        ringDefs.forEach(ring => {
+            paths.push(`<circle cx="${cx}" cy="${cy}" r="${ring.r}" stroke-dasharray="${ring.dash}" stroke-width="${ring.sw}"/>`);
+        });
+
+        [58, 118, 183].forEach((pr) => {
+            for (let i = 0; i < spokes; i++) {
+                const a1 = (i / spokes) * Math.PI * 2;
+                const a2 = ((i + 0.8) / spokes) * Math.PI * 2;
+                const midA = (a1 + a2) / 2;
+                const x1 = cx + pr * Math.cos(a1), y1 = cy + pr * Math.sin(a1);
+                const x2 = cx + pr * Math.cos(a2), y2 = cy + pr * Math.sin(a2);
+                const mx = cx + pr * 1.14 * Math.cos(midA), my = cy + pr * 1.14 * Math.sin(midA);
+                paths.push(`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" stroke-width="0.7" stroke-opacity="0.6" fill="none"/>`);
+            }
+        });
+
+        [[58, spokes], [118, spokes], [183, Math.floor(spokes/2)]].forEach(([pr, sp]) => {
+            for (let i = 0; i < sp; i++) {
+                const angle = (i / sp) * Math.PI * 2;
+                const dx = cx + pr * Math.cos(angle), dy = cy + pr * Math.sin(angle);
+                paths.push(`<rect x="${(dx-2).toFixed(1)}" y="${(dy-2).toFixed(1)}" width="4" height="4" transform="rotate(45,${dx.toFixed(1)},${dy.toFixed(1)})" stroke-width="0.6" opacity="0.6"/>`);
+            }
+        });
+
+        for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            const lx = cx + 20 * Math.cos(a), ly = cy + 20 * Math.sin(a);
+            const a2 = a + Math.PI / 8;
+            const ex = cx + 20 * Math.cos(a2), ey = cy + 20 * Math.sin(a2);
+            paths.push(`<path d="M${cx},${cy} Q${lx.toFixed(1)},${ly.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" stroke-width="0.8" opacity="0.7" fill="none"/>`);
+        }
+        paths.push(`<circle cx="${cx}" cy="${cy}" r="9" stroke-width="1.2"/>`);
+        paths.push(`<circle cx="${cx}" cy="${cy}" r="4" fill="rgba(255,215,0,0.3)" stroke="none"/>`);
+
+        return `<svg viewBox="0 0 500 500" width="${size}" height="${size}" fill="none" stroke="var(--art-gold)">${paths.join('')}</svg>`;
+    }
+
+    function scatterMandalas() {
+        const layer = document.getElementById('art-layer');
+        const configs = [
+            ['2%', '-10%', 280, 0.14, 32, 0, '0deg', '360deg', 7, 12],
+            ['58%', '52%', 220, 0.12, 42, 5, '20deg', '200deg', 7, 8],
+            ['26%', '34%', 105, 0.10, 22, 9, '-10deg', '170deg', 5, 8],
+            ['72%', '-14%', 190, 0.12, 38, 2, '35deg', '215deg', 6, 12],
+            ['-4%', '50%', 155, 0.11, 29, 12, '50deg', '230deg', 6, 10],
+            ['40%', '72%', 88, 0.09, 19, 7, '-20deg', '160deg', 4, 8],
+            ['83%', '58%', 130, 0.10, 26, 15, '0deg', '180deg', 5, 12],
+            ['16%', '76%', 168, 0.11, 34, 4, '60deg', '240deg', 7, 16],
+            ['48%', '-7%', 96, 0.09, 21, 10, '10deg', '190deg', 5, 8],
+            ['66%', '28%', 118, 0.10, 28, 17, '-5deg', '175deg', 6, 10],
+        ];
+
+        configs.forEach(([top, left, size, op, dur, delay, rs, re, rings, spokes]) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'mandala-scatter';
+            wrap.style.top = top;
+            wrap.style.left = left;
+            wrap.style.setProperty('--op', op);
+            wrap.style.setProperty('--dur', dur + 's');
+            wrap.style.setProperty('--delay', delay + 's');
+            wrap.style.setProperty('--rs', rs);
+            wrap.style.setProperty('--re', re);
+            wrap.innerHTML = buildMandala(rings, spokes, size);
+            layer.appendChild(wrap);
+        });
+    }
+    scatterMandalas();
+
+    /* ═══ PARTICLES ═══ */
+    function createParticles() {
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const isGold = Math.random() > 0.35;
+            const size = Math.random() < 0.25 ? 3 : 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.background = isGold ? '#FFD700' : 'rgba(255,255,255,0.7)';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.setProperty('--pdelay', (Math.random() * 7) + 's');
+            p.style.setProperty('--pdur', (8 + Math.random() * 9) + 's');
+            p.style.setProperty('--drift', (Math.random() * 50 - 25) + 'px');
+            if (isGold) p.style.boxShadow = '0 0 4px rgba(255,215,0,0.6)';
+            container.appendChild(p);
+        }
+    }
+    createParticles();
+
+    /* ═══ RIPPLE ═══ */
+    function addRipple(e, el) {
+        const rect = el.getBoundingClientRect();
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        const size = Math.max(rect.width, rect.height);
+        r.style.width = size + 'px';
+        r.style.height = size + 'px';
+        r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        r.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        el.appendChild(r);
+        r.addEventListener('animationend', () => r.remove());
+    }
+
+    /* ═══ DATA & STATE ═══ */
+    const participants = [
+        { name: "Arjun Reddy", id: "1RV23CS001", cat: "Male" },
+        { name: "Vikram Singh", id: "1RV23EC010", cat: "Male" },
+        { name: "Rohan Das", id: "1RV23ME055", cat: "Male" },
+        { name: "Siddarth M", id: "1RV23CV012", cat: "Male" },
+        { name: "Kiran V", id: "1RV23AE004", cat: "Male" },
+        { name: "Aryan Raj", id: "1RV23CS102", cat: "Male" },
+        { name: "Aditi Sharma", id: "1RV23IS022", cat: "Female" },
+        { name: "Priya Rao", id: "1RV23BT045", cat: "Female" },
+        { name: "Anjali Kumar", id: "1RV23CS099", cat: "Female" },
+        { name: "Neha Gupta", id: "1RV23EC033", cat: "Female" },
+        { name: "Sana Mir", id: "1RV23CH008", cat: "Female" },
+        { name: "Riya Sen", id: "1RV23ML011", cat: "Female" }
+    ];
+
+    let currentCat = 'Male';
+    let selections = { Male: null, Female: null };
+
+    function setCategory(cat) {
+        currentCat = cat;
+        const slider = document.getElementById('tab-slider');
+        if (cat === 'Male') {
+            document.body.className = 'male-theme';
+            document.getElementById('tab-male').classList.add('active');
+            document.getElementById('tab-female').classList.remove('active');
+            slider.classList.remove('right');
+        } else {
+            document.body.className = 'female-theme';
+            document.getElementById('tab-female').classList.add('active');
+            document.getElementById('tab-male').classList.remove('active');
+            slider.classList.add('right');
+        }
+        document.getElementById('search-box').value = '';
+
+        const list = document.getElementById('list-area');
+        list.style.opacity = '0';
+        setTimeout(() => {
+            renderList();
+            list.style.opacity = '1';
+        }, 250);
+    }
+
+    function filterList() { renderList(); }
+
+    function renderList() {
+        const list = document.getElementById('list-area');
+        const searchV = document.getElementById('search-box').value.toLowerCase();
+        list.innerHTML = '';
+
+        const items = participants.filter(p =>
+            p.cat === currentCat &&
+            (p.name.toLowerCase().includes(searchV) || p.id.toLowerCase().includes(searchV))
+        );
+
+        if (!items.length) {
+            list.innerHTML = `<div style="text-align:center;padding:26px;color:rgba(255,255,255,0.2);letter-spacing:1.8px;font-size:0.72rem;">NO CANDIDATES</div>`;
+            return;
+        }
+
+        items.forEach((p, index) => {
+            const el = document.createElement('div');
+            const isSelected = selections[currentCat] === p.id;
+            el.className = `participant-card ${isSelected ? 'selected' : ''}`;
+            el.style.animationDelay = (index * 0.05) + 's';
+            el.innerHTML = `
+                <div>
+                    <div class="card-name">${p.name}</div>
+                    <div class="card-id">${p.id}</div>
+                </div>
+                ${isSelected ? '<div class="selected-star">★</div>' : '<div class="unselected-ring">○</div>'}
+            `;
+            el.addEventListener('click', (e) => {
+                addRipple(e, el);
+                selectParticipant(p.id);
+            });
+            list.appendChild(el);
+        });
+    }
+
+    function selectParticipant(id) {
+        selections[currentCat] = id;
+        document.getElementById(currentCat === 'Male' ? 'tab-male' : 'tab-female').classList.add('done');
+        renderList();
+        checkVote();
+    }
+
+    function checkVote() {
+        const btn = document.getElementById('btn-vote');
+        const hint = document.getElementById('hint-text');
+
+        if (selections.Male && selections.Female) {
+            btn.classList.add('visible');
+            hint.style.display = 'none';
+        } else {
+            btn.classList.remove('visible');
+            hint.style.display = 'block';
+            if (!selections.Male) hint.innerText = 'Select a Prince';
+            else if (!selections.Female) hint.innerText = 'Select a Princess';
+        }
+    }
+
+    function submitVote() {
+        if (!selections.Male || !selections.Female) return;
+
+        // Hide UI content
+        document.getElementById('ui-content').classList.add('hidden');
+
+        // Show black overlay
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.add('show');
+
+        // Animate V symbol
+        setTimeout(() => {
+            document.getElementById('success-v-symbol').classList.add('animate');
+        }, 200);
+
+        // Animate success text
+        setTimeout(() => {
+            document.getElementById('success-title').classList.add('animate');
+        }, 800);
+
+        // Hide black screen after 4 seconds
+        setTimeout(() => {
+            overlay.classList.remove('show');
+            
+            // Show page content again with timer centered
+            setTimeout(() => {
+                document.getElementById('ui-content').classList.remove('hidden');
+                document.getElementById('timer-wrapper').classList.add('centered');
+                document.getElementById('timer-container').classList.add('glow');
+            }, 600);
+        }, 4000);
+    }
+
+    /* ═══ TIMER ═══ */
+    let seconds = 4886;
+    setInterval(() => {
+        if (seconds > 0) seconds--;
+        const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+    }, 1000);
+
+    renderList();
+    </script>
+</body>
+</html>
